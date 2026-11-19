@@ -67,6 +67,27 @@
 | `bmp` / `bmp show` | состояние, адрес, chip id, температура, давление |
 | `bmp help` | справка |
 
+## Проверено (2026-11-19, ESP32)
+
+- env `esp32-i2c-mapper`, прошивка `0.117.20261119_1754.2104`.
+- Датчик: адрес `0x76`, `CHIP_ID 0x58`; показания `27.09 °C`, `972.2 hPa`.
+- `/bmp280.html` — 200; `/bmp280/info|read|ver` — CVT; ресурсы есть в `/state/catalog`
+  и `/macros/resources.json`.
+- Терминал: `bmp`, `bmp show`, `bmp help`; `bmp foo` → unknown, `bmp show extra` → usage.
+- Обнаружен и исправлен дефект: целочисленная компенсация Bosch возвращает давление
+  в Q24.8, поэтому в гПа переводится делением на 25600.
+
+## Пример макроса
+
+```lua
+every("*/15 * * * * *", function()
+    print("BMP280", bmp280.available, bmp280.temperature, bmp280.pressure)
+end)
+```
+
+Готовые cron-примеры для всех датчиков: `module_macros/web/macros/sensors_15s.lua`,
+`sensors_30s.lua`, `sensors_1m.lua`, `sensors_5m.lua`.
+
 ## Слоистая структура
 
 ```
